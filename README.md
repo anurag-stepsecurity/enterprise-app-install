@@ -9,6 +9,11 @@ Based on [GitHub's guide for automating app installations](https://docs.github.c
 - GitHub Enterprise Cloud
 - Enterprise owner or admin permissions
 
+> [!IMPORTANT]
+> The steps below are for **github.com**. If your enterprise runs on **GHES** or
+> **GHEC with Data Residency (DR)**, skip to
+> [GHES or GHEC with DR (Data Residency)](#ghes-or-ghec-with-dr-data-residency).
+
 ## Setup
 
 ### 1. Create the Installer App
@@ -59,22 +64,23 @@ Go to this repository's **Settings > Secrets and variables > Actions**
 | `ENTERPRISE_SLUG` | Your enterprise slug (from URL: `github.com/enterprises/YOUR-SLUG`) |
 | `INSTALLER_APP_CLIENT_ID` | The Client ID from step 4 |
 
-## GHES
+## GHES or GHEC with DR (Data Residency)
 
 > [!NOTE]
-> Requires GHES **3.19 or later**. See the
+> **GHES** requires version **3.19 or later**. See the
 > [GHES 3.19 release notes](https://docs.github.com/en/enterprise-server@3.19/admin/release-notes#apis).
+> This version requirement does not apply to **GHEC DR**.
 
 ### Prerequisites
 
-- The StepSecurity apps must already be registered on your GHES instance and
+- The StepSecurity apps must already be registered on your GHES / GHEC DR instance and
   installed on **at least in one org** before running this tool, that's how the
   apps get their client IDs (`REGULAR_APP_CLIENT_ID` / `ADVANCED_APP_CLIENT_ID`).
   Set this up first via the
   [GHES admin console guide](https://docs.stepsecurity.io/administration/admin-console/resources/github-enterprise-servers),
   then use this tool to roll the install out to the rest of your organizations.
 - A **self-hosted (or GHES-hosted) runner inside your network** so the workflow
-  can reach the GHES API.
+  can reach the GHES / GHEC DR API.
 
 ### Setup
 
@@ -103,18 +109,18 @@ Go to this repository's **Settings > Secrets and variables > Actions**
 
 - **Installer app**: on the app's settings page, copy the **Client ID** (starts with `Iv`)
 - **Target apps**: get the Client IDs of the StepSecurity apps you already
-  registered/installed on this GHES instance, see the
+  registered/installed on this GHES / GHEC DR instance, see the
   [GHES admin console guide](https://docs.stepsecurity.io/administration/admin-console/resources/github-enterprise-servers)
 
-#### 5. Commit This Repo to Your GHES Instance
+#### 5. Commit This Repo to Your GHES / GHEC DR Instance
 
-1. Push this repo to a repository hosted on your **GHES** instance
+1. Push this repo to a repository hosted on your **GHES / GHEC DR** instance
 2. Ensure a **self-hosted runner** is available (adjust `runs-on` in
    [install-app-ghes.yml](.github/workflows/install-app-ghes.yml) if you use a specific label)
 
 #### 6. Configure Repository Secrets and Variables
 
-Go to this repository's **Settings > Secrets and variables > Actions** (on the GHES repo)
+Go to this repository's **Settings > Secrets and variables > Actions** (on the GHES / GHEC DR repo)
 
 ##### Secrets
 
@@ -255,6 +261,11 @@ The installer app is not installed on your enterprise. Go to the app's settings 
 
 ### Apps show as "Successfully installed" but were already installed
 This can happen if the install API is idempotent. The workflow now checks existing installations before attempting to install.
+
+### "failed to get installations. HTTP 404" or "Integration not found"
+Please ensure you're using correct workflows, with correct regular and advanced apps client IDs:
+- [Public GitHub](https://github.com) use [install-app.yml](.github/workflows/install-app.yml)
+- [GHES](https://docs.github.com/en/enterprise-server@3.19/admin/overview/about-github-enterprise-server) / [GHEC DR](https://docs.github.com/en/enterprise-cloud@latest/admin/data-residency/about-github-enterprise-cloud-with-data-residency) use [install-app-ghes.yml](.github/workflows/install-app-ghes.yml)
 
 ## References
 

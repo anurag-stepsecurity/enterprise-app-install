@@ -1,4 +1,4 @@
-name: Install GitHub App to Organizations (GHES)
+name: Install GitHub App to Organizations (GHES / GHEC DR)
 
 on:
   workflow_dispatch:
@@ -13,19 +13,19 @@ permissions: {}
 
 jobs:
   install-app:
-    # IMPORTANT: must run inside the GHES network to reach the GHES API.
-    # Use a self-hosted or GHES-hosted runner on the instance.
+    # IMPORTANT: must run inside the GHES / GHEC DR network to reach its API.
+    # Use a self-hosted or instance-hosted runner.
     permissions:
       contents: read # for actions/checkout to fetch code
     runs-on: self-hosted
     env:
-      # Installer app (registered on your GHES instance,
+      # Installer app (registered on your GHES / GHEC DR instance,
       # "Enterprise organization installations: Read and write")
       INSTALLER_APP_PRIVATE_KEY: ${{ secrets.INSTALLER_APP_PRIVATE_KEY }}
       INSTALLER_APP_CLIENT_ID: ${{ vars.INSTALLER_APP_CLIENT_ID }}
       ENTERPRISE_SLUG: ${{ vars.ENTERPRISE_SLUG }}
       
-      # Target StepSecurity apps, as registered on THIS GHES instance
+      # Target StepSecurity apps, as registered on THIS GHES / GHEC DR instance
       REGULAR_APP_CLIENT_ID: ${{ vars.REGULAR_APP_CLIENT_ID }}
       ADVANCED_APP_CLIENT_ID: ${{ vars.ADVANCED_APP_CLIENT_ID }}
       DRY_RUN: ${{ inputs.dry_run }}
